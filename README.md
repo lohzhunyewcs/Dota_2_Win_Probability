@@ -2,5 +2,5 @@
 Given line up of both sides, a winrate prediction will be made for which side is more likely to win.
 
 # Contributors:
-Lim Khai Fung
+Lim Khai Fung<br/>
 Loh Zhun Yew
