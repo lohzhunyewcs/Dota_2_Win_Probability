@@ -6,7 +6,10 @@ from flask import Flask, session, request, render_template, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
-from predictor import predict, createClassifier
+#from predictor import predict, createClassifier
+
+import randomForesttest as rft
+
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
 
@@ -16,7 +19,11 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-classifier = createClassifier()
+matchData = rft.readData("testMatches_noBool.csv")
+cleanedData = rft.cleanData(matchData)
+rforest = rft.scikitRForest(cleanedData)
+tforest = rft.tensorFlowRForest(cleanedData)
+xgbforest = rft.xgBoost(cleanedData)
 
 class Hero:
     def __init__(self, ID, name):
@@ -25,6 +32,9 @@ class Hero:
     
     def __str__(self):
         return f'ID: {self.id} Name: {self.name}'
+
+    def __lt__(self, other):
+        return self.name < other.name
 
 @app.route("/")
 def index():
@@ -35,6 +45,7 @@ def index():
             newHero = Hero(hero['id'], hero['localized_name'])
             # print(f'newHero: {newHero}')
             heroList.append(newHero)
+    heroList = sorted(heroList)
     return render_template('index.html', heroes=heroList)
 
 # @app.route("/hello", methods=["POST"])
@@ -50,6 +61,9 @@ def predictor():
     dire = request.form.get('dHero')
     print(f'Dire Heroes: {dire}')
     dire = dire.split(',')
-    rate = predict(radiant, dire, classifier) * 100
+    rforestrate = rft.predictResult(radiant, dire, rforest) * 100
+    tforestrate = rft.predictResult(radiant, dire, tforest, True) * 100
+    xgbrate = rft.predictResult(radiant, dire, xgbforest) * 100
+    avgrate = ((rforestrate + tforestrate + xgbrate) / 3)
     # TODO: Change rate to actual predictor
-    return jsonify({"rate": rate})
+    return jsonify({'rforestrate': rforestrate, 'tforestrate': tforestrate, 'xgbrate': xgbrate, 'avgrate': avgrate})

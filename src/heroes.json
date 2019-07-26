@@ -201,9 +201,9 @@
             "localized_name": "Faceless Void"
         },
         {
-            "name": "skeleton_king",
+            "name": "wraith_king",
             "id": 42,
-            "localized_name": "Skeleton King"
+            "localized_name": "Wraith King"
         },
         {
             "name": "death_prophet",
@@ -526,9 +526,9 @@
             "localized_name": "Earth Spirit"
         },
         {
-            "name": "abyssal_underlord",
+            "name": "underlord",
             "id": 108,
-            "localized_name": "Abyssal Underlord"
+            "localized_name": "Underlord"
         },
         {
             "name": "terrorblade",
