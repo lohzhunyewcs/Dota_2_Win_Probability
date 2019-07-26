@@ -73,7 +73,7 @@ def predict(radiant, dire, classifier):
 def createClassifier():
     params = tf.contrib.tensor_forest.python.tensor_forest.ForestHParams(
       num_classes=2, num_features=258,
-      num_trees=50, max_nodes=1000).fill()
+      num_trees=500, max_nodes=1000).fill()
     print('params set')
     # params = tf.contrib.tensor_forest.python.tensor_forest.ForestHParams(
     #  num_classes=3, num_features=4, num_trees=50, max_nodes=1000, split_after_samples=50).fill()

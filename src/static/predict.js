@@ -20,8 +20,14 @@
               const data = JSON.parse(request.responseText);
 
               // Update the result div
-              const predictions = `Predicted winrate:\nRadiant: ${data.rate.toFixed(2)}%\nDire: ${(100 - data.rate).toFixed(2)}%`
-              document.querySelector('#result').innerHTML = predictions;
+              const rforestpredictions =  `Random Forest Predicted winrate:<br/>Radiant: ${data.rforestrate.toFixed(2)}% vs Dire: ${(100 - data.rforestrate).toFixed(2)}%`
+              document.querySelector('#rforestrate').innerHTML = rforestpredictions;
+              const tforestpredictions =  `Tensorflow RForest Predicted winrate:<br/>Radiant: ${data.tforestrate.toFixed(2)}% vs Dire: ${(100 - data.tforestrate).toFixed(2)}%`
+              document.querySelector('#tforestrate').innerHTML = tforestpredictions;
+              const xgbpredictions =  `XGBoost Predicted winrate:<br/>Radiant: ${data.xgbrate.toFixed(2)}% vs Dire: ${(100 - data.xgbrate).toFixed(2)}%`
+              document.querySelector('#xgbrate').innerHTML = xgbpredictions;
+              const avgpredictions = `Average Predicted winrate:<br/>Radiant: ${data.avgrate.toFixed(2)}% vs Dire: ${(100 - data.avgrate).toFixed(2)}%`
+              document.querySelector('#avgrate').innerHTML = avgpredictions;
           }
 
           // Add data to send with request
