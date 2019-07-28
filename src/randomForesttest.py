@@ -8,7 +8,7 @@ from sklearn.metrics import roc_curve, auc
 
 import tensorflow as tf
 import xgboost as xgb
-
+from MinHeap import MinHeap
 
 def readData(filename):
     readData = pd.read_csv(filename)
@@ -88,7 +88,8 @@ def xgBoost(splittedData, training = False):
         xg_model = xgb.XGBClassifier(objective='binary:logistic', max_depth=3, n_estimators=300, learning_rate=0.2) \
             .fit(splittedData[0], splittedData[2])
         predictions = xg_model.predict(splittedData[1])
-
+        softpredictions = xg_model.predict_proba(splittedData[1])
+        print(softpredictions)
         print(confusion_matrix(splittedData[3], predictions))
         print(classification_report(splittedData[3], predictions))
         print(accuracy_score(splittedData[3], predictions))
@@ -131,6 +132,63 @@ def predictResult(radiant, dire, classifier, tensor = False):
 
         return out_soft[0][1]
 
+def predictLastPick(radiant, dire, classifiers):
+    uniqueColList = [24, 115, 116, 117, 118, 122, 123, 124, 125, 126, 127, 128]
+    heroesScreened = []
+    data = []
+    if len(radiant) == 4:
+        counter = 0
+    else:
+        counter = 129
+    for i in range(117):
+        if counter + 1 not in radiant and counter + 1 not in dire and counter + 1 not in uniqueColList:
+            newRow = [0] * 258
+            for i in radiant:
+                newRow[int(i)-1] = 1
+            for i in dire:
+                newRow[int(i)+129-1] = 1
+
+            for i in range(len(uniqueColList)):
+                newRow[uniqueColList[i] - 1] = 2
+                newRow[uniqueColList[i] + 129 - 1] = 2
+
+            newRow[counter] = 1
+            while 2 in newRow:
+                newRow.remove(2)
+            data.append(newRow)
+            heroesScreened.append(counter+1)
+        counter += 1
+
+    data = np.array(data)
+    scikitprob_out = classifiers[0].predict_proba(data)
+    y_out = list(classifiers[1].predict(x=data))
+    tensorout_soft = list(y['probabilities'] for y in y_out)
+    xgbprob_out = classifiers[2].predict_proba(data)
+
+    heroesHeap = MinHeap(5)
+    for i in range(len(xgbprob_out)):
+        probability = (scikitprob_out[i] + tensorout_soft[i] + xgbprob_out[i]) / 3
+        if len(heroesHeap) < 5:
+            if len(radiant) == 4:
+                heroesHeap.push([heroesScreened[i], probability[1]])
+            else:
+                heroesHeap.push([heroesScreened[i], probability[0]])
+        else:
+            if len(radiant) == 4:
+                if probability[1] > heroesHeap.array[1][1]:
+                    heroesHeap.pop()
+                    heroesHeap.push([heroesScreened[i], probability[1]])
+            else:
+                if probability[0] > heroesHeap.array[1][1]:
+                    heroesHeap.pop()
+                    heroesHeap.push([heroesScreened[i], probability[0]])
+
+    heroProb = []
+    for i in range(len(heroesHeap)):
+        heroProb.append(heroesHeap.pop())
+
+    return heroProb[::-1]
+
 
 if __name__ == "__main__":
     matchData = readData("testMatches_noBool.csv")
@@ -143,7 +201,7 @@ if __name__ == "__main__":
     # np.random.seed(9999)
     # xgBoost(split)
 
-    radiant = [20, 35, 14, 7, 32]
+    radiant = [20, 35, 14, 7]
     dire = [17, 18, 26, 84, 96]
     #rforest = scikitRForest(cleanedData)
     #predictResult(radiant, dire, rforest)
@@ -152,7 +210,8 @@ if __name__ == "__main__":
     #print(predictResult(radiant, dire, tforest, True))
 
     xgbmodel = xgBoost(cleanedData)
-    print(predictResult(radiant, dire, xgbmodel))
+    print(predictLastPick(radiant, dire, [xgbmodel]))
+    #print(predictResult(radiant, dire, xgbmodel))
 
 
 

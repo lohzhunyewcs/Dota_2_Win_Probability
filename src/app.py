@@ -117,74 +117,82 @@ def last_pick():
     print(f'Dire Heroes: {dire}')
     dire = dire.split(',')
     
-    remainingHeroes = heroList[:]
-    # index_to_pop = []
-    # for index, hero in enumerate(heroList):
-    #     if hero.id in radiant or hero.id in dire:
-    #         index_to_pop.append(index)
+    # remainingHeroes = heroList[:]
+    # # index_to_pop = []
+    # # for index, hero in enumerate(heroList):
+    # #     if hero.id in radiant or hero.id in dire:
+    # #         index_to_pop.append(index)
+    #
+    # # for index, popIndex in enumerate(index_to_pop):
+    # #     remainingHeroes.pop(popIndex - index)
+    #
+    # # for hero_id in radiant:
+    # #     for index, hero in enumerate(remainingHeroes):
+    # #         if hero.id == hero_id:
+    # #             break
+    # #     remainingHeroes.pop(index)
+    #
+    # # for hero_id in dire:
+    # #     for index, hero in enumerate(remainingHeroes):
+    # #         if hero.id == hero_id:
+    # #             break
+    # #     remainingHeroes.pop(index)
+    # print('starting last pick prediction')
+    # rateList = []
+    # # TODO Remove oriDire/oriRadiant
+    # # if dire last pick
+    # if len(dire) == 4:
+    #     oriDire = dire
+    #     currentID = 0
+    #     currentRate = 0
+    #     for hero in remainingHeroes:
+    #         if hero.id not in radiant and hero.id not in oriDire:
+    #             dire = oriDire + [hero.id]
+    #             rate = predict(radiant, dire)
+    #             heroRate = predictHero(hero.name, rate)
+    #             rateList.append(heroRate)
+    #             rateList.sort()
+    #             rateList.reverse()
+    #             if len(rateList) > 5:
+    #                 rateList.pop()
+    #
+    #
+    #
+    # # else if radiant last pick
+    # else:
+    #     oriRadiant = radiant
+    #     currentID = 0
+    #     currentRate = 0
+    #     for hero in remainingHeroes:
+    #         if hero.id not in oriRadiant and hero.id not in dire:
+    #             radiant = oriRadiant + [hero.id]
+    #             rate = predict(radiant, dire)
+    #             heroRate = predictHero(hero.name, rate)
+    #             rateList.append(heroRate)
+    #             rateList.sort()
+    #             rateList.reverse()
+    #             if len(rateList) > 5:
+    #                 rateList.pop()
+    top5picks = rft.predictLastPick(radiant, dire, [rforest, tforest, xgbforest])
+    heroName = []
+    allRate = []
+    for i in range(5):
+        for j in range(len(heroList)):
+            if heroList[j].id == top5picks[i][0]:
+                heroName.append(heroList[j].name)
+                allRate.append(top5picks[i][1])
 
-    # for index, popIndex in enumerate(index_to_pop):
-    #     remainingHeroes.pop(popIndex - index) 
-
-    # for hero_id in radiant:
-    #     for index, hero in enumerate(remainingHeroes):
-    #         if hero.id == hero_id:
-    #             break
-    #     remainingHeroes.pop(index)
-
-    # for hero_id in dire:
-    #     for index, hero in enumerate(remainingHeroes):
-    #         if hero.id == hero_id:
-    #             break
-    #     remainingHeroes.pop(index)
-    print('starting last pick prediction')
-    rateList = []
-    # TODO Remove oriDire/oriRadiant
-    # if dire last pick
-    if len(dire) == 4:
-        oriDire = dire
-        currentID = 0
-        currentRate = 0
-        for hero in remainingHeroes:
-            if hero.id not in radiant and hero.id not in oriDire:
-                dire = oriDire + [hero.id]
-                rate = predict(radiant, dire)
-                heroRate = predictHero(hero.name, rate) 
-                rateList.append(heroRate)
-                rateList.sort()
-                rateList.reverse()
-                if len(rateList) > 5:
-                    rateList.pop()
-                
-                
-
-    # else if radiant last pick
-    else:
-        oriRadiant = radiant
-        currentID = 0
-        currentRate = 0
-        for hero in remainingHeroes:
-            if hero.id not in oriRadiant and hero.id not in dire:
-                radiant = oriRadiant + [hero.id]
-                rate = predict(radiant, dire) 
-                heroRate = predictHero(hero.name, rate) 
-                rateList.append(heroRate)
-                rateList.sort()
-                rateList.reverse()
-                if len(rateList) > 5:
-                    rateList.pop()
-
-    print(f'currentID: {currentID}')
-    print('last pick prediction complete')
-    # # rate = predict(radiant, dire, classifier) * 100
-    # for hero in remainingHeroes:
-    #     if hero.id == currentID:
-    #         hero_name = hero.name
-    #         break
-    print(f'rateList: {rateList}')
-    currentRate = [hero.rate for hero in rateList]
-    hero_name = [hero.name for hero in rateList]
-    print(f'currentRate: \n{currentRate}')
-    print(f'hero_namem: \n{hero_name}')
-    return jsonify({"rate": currentRate, 'hero': hero_name})    
+    # print(f'currentID: {currentID}')
+    # print('last pick prediction complete')
+    # # # rate = predict(radiant, dire, classifier) * 100
+    # # for hero in remainingHeroes:
+    # #     if hero.id == currentID:
+    # #         hero_name = hero.name
+    # #         break
+    # print(f'rateList: {rateList}')
+    # # currentRate = [hero.rate for hero in rateList]
+    # # hero_name = [hero.name for hero in rateList]
+    # print(f'currentRate: \n{currentRate}')
+    # print(f'hero_namem: \n{hero_name}')
+    return jsonify({"rate": allRate, 'hero': heroName})
 

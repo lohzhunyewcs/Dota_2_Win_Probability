@@ -39,9 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Update the result div
                 // const predictions = `Predicted winrate:\nRadiant: ${data.rate.toFixed(2)}%\nDire: ${(100 - data.rate).toFixed(2)}%`
                 // const predictions = `Recommended Hero: ${data.hero}\nPredicted winrate: ${data.rate.toFixed(2)}`
-                let predictions = 'Top 5 Suggested Hero'
+                let predictions = 'Top 5 Suggested Heroes'
                 for (i = 0; i < 5; i++){
-                    predictions += `\n${i}. ${data.hero[i]}, ${data.rate[i].toFixed(2)}`
+                    predictions += `<br/>${i}. ${data.hero[i]}, ${data.rate[i].toFixed(2)}`
                 }
                 document.querySelector('#result').innerHTML = predictions;
             }
