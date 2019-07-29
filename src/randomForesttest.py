@@ -140,8 +140,8 @@ def predictLastPick(radiant, dire, classifiers):
         counter = 0
     else:
         counter = 129
-    for i in range(117):
-        if counter + 1 not in radiant and counter + 1 not in dire and counter + 1 not in uniqueColList:
+    for i in range(129):
+        if counter + 1 not in radiant and counter - 129 + 1 not in dire and counter + 1 not in uniqueColList and counter - 129 + 1 not in uniqueColList:
             newRow = [0] * 258
             for i in radiant:
                 newRow[int(i)-1] = 1
@@ -156,7 +156,10 @@ def predictLastPick(radiant, dire, classifiers):
             while 2 in newRow:
                 newRow.remove(2)
             data.append(newRow)
-            heroesScreened.append(counter+1)
+            id = counter
+            if counter > 128:
+                id -= 128
+            heroesScreened.append(id+1)
         counter += 1
 
     data = np.array(data)
@@ -201,8 +204,8 @@ if __name__ == "__main__":
     # np.random.seed(9999)
     # xgBoost(split)
 
-    radiant = [20, 35, 14, 7]
-    dire = [17, 18, 26, 84, 96]
+    radiant = [1, 2, 3, 4]
+    dire = [6, 7, 8, 9, 10]
     #rforest = scikitRForest(cleanedData)
     #predictResult(radiant, dire, rforest)
 
