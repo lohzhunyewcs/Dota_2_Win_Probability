@@ -257,8 +257,8 @@ if __name__ == "__main__":
     #scikitRForest(split, True)
     #xgBoost(split, True)
 
-    radiant = [12, 27, 33, 45, 53]
-    dire = [26, 17, 78, 119, 106]
+    # radiant = [12, 27, 33, 45, 53]
+    # dire = [26, 17, 78, 119, 106]
     # rforest = scikitRForest(cleanedData)
     # print(predictResult(radiant, dire, rforest))
     #
