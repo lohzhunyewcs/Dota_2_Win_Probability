@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+    <script type=text/javascript src="{{
+        url_for('static', filename='predict.js') }}"></script>
+    <head>
+        <title>Dota 2 Win Predictor</title>
+    </head>
+    <body>
+        <form id = "form">
+            Radiant
+            {% for i in range(5) %}
+                <br>
+                Hero {{ i+1 }}:
+                <select id = "rHero{{ i }}">
+                    {% for hero in heroes %}
+                        <option value="{{ hero.id }}">{{ hero.name }}</option>
+                    {% endfor %}
+                </select>
+            {% endfor %}
+        <br>
+        <div id = "Dire" style="text-align:right;margin-top: -120px"> 
+        Dire
+            {% for i in range(5) %}
+            <br>
+            
+            <select id = "dHero{{ i }}">
+                    {% for hero in heroes %}
+                        <option value="{{ hero.id }}">{{ hero.name }}</option>
+                    {% endfor %}
+            </select>
+            :Hero {{ i+1 }}
+            {% endfor %}
+        <br>
+        <br>
+        </div>
+        <div id="button" style="text-align:center">
+            <input type="submit" value="Predict outcome">
+        </div> 
+        </form>
+        <div id="rforestrate" style="text-align:center;margin-top: 25px"></div>
+        <div id="nnmlprate" style="text-align:center;margin-top: 25px"></div>
+        <div id="xgbrate" style="text-align:center;margin-top: 25px"></div>
+        <div id="testrate" style="text-align:center;margin-top: 25px"></div>
+        <div id="avgrate" style="text-align:center;margin-top: 25px"></div>
+    </body>
+</html>
