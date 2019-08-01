@@ -8,7 +8,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 #from predictor import predict, createClassifier
 
-import randomForesttest as rft
+import allModelFile as rft
+import pickle
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -19,12 +20,28 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-matchData = rft.readData("testMatches_noBool.csv")
-cleanedData = rft.cleanData(matchData)
-rforest = rft.scikitRForest(cleanedData)
-tforest = rft.tensorFlowRForest(cleanedData)
-xgbforest = rft.xgBoost(cleanedData)
+def generateModels():
+    matchData = rft.readData("testMatches_noBool.csv")
+    cleanedData = rft.cleanData(matchData)
+    rforestmodel = rft.scikitRForest(cleanedData)
+    nnmlpmodel = rft.scikitMLP(cleanedData)
+    xgbforestmodel = rft.xgBoost(cleanedData)
+    testmodel = rft.scikitTest(cleanedData)
 
+    rfilename = 'scikitrforest_model.sav'
+    nnmlpfilename = 'nnmlp_model.sav'
+    xgbfilename = 'xgboost_model.sav'
+    testfilename = 'test_model.sav'
+    pickle.dump(rforestmodel, open(rfilename, 'wb'))
+    pickle.dump(nnmlpmodel, open(nnmlpfilename, 'wb'))
+    pickle.dump(xgbforestmodel, open(xgbfilename, 'wb'))
+    pickle.dump(testmodel, open(testfilename, 'wb'))
+
+generateModels()
+rforest = pickle.load(open('scikitrforest_model.sav', 'rb'))
+nnmlp = pickle.load(open('nnmlp_model.sav', 'rb'))
+xgbforest = pickle.load(open('xgboost_model.sav', 'rb'))
+testmo = pickle.load(open('test_model.sav', 'rb'))
 print('predictor complete')
 
 class Hero:
@@ -90,23 +107,24 @@ def predictor():
     print(f'Dire Heroes: {dire}')
     dire = dire.split(',')
     rforestrate = rft.predictResult(radiant, dire, rforest) * 100
-    tforestrate = rft.predictResult(radiant, dire, tforest, True) * 100
+    nnmlprate = rft.predictResult(radiant, dire, nnmlp) * 100
     xgbrate = rft.predictResult(radiant, dire, xgbforest) * 100
-    avgrate = ((rforestrate + tforestrate + xgbrate) / 3)
+    testrate = rft.predictResult(radiant, dire, testmo) * 100
+    avgrate = ((rforestrate + xgbrate) / 2)
     print('prediction done')
     # TODO: Change rate to actual predictor
-    return jsonify({'rforestrate': rforestrate, 'tforestrate': tforestrate, 'xgbrate': xgbrate, 'avgrate': avgrate})
+    return jsonify({'rforestrate': rforestrate, 'nnmlprate': nnmlprate, 'xgbrate': xgbrate, 'testrate': testrate, 'avgrate': avgrate})
 
 
 @app.route("/<string:team>/last_pick")
 def last_pick_page(team):
     return render_template("last_pick_template.html", team=team, heroes=heroList)
 
-def predict(radiant, dire):
-    rforestrate = rft.predictResult(radiant, dire, rforest) * 100
-    tforestrate = rft.predictResult(radiant, dire, tforest, True) * 100
-    xgbrate = rft.predictResult(radiant, dire, xgbforest) * 100
-    return ((rforestrate + tforestrate + xgbrate) / 3)
+# def predict(radiant, dire):
+#     rforestrate = rft.predictResult(radiant, dire, rforest) * 100
+#     nnmlprate = rft.predictResult(radiant, dire, nnmlp, True) * 100
+#     xgbrate = rft.predictResult(radiant, dire, xgbforest) * 100
+#     return ((rforestrate + nnmlprate + xgbrate) / 3)
 
 @app.route("/last_pick", methods=["POST"])
 def last_pick():
@@ -173,7 +191,7 @@ def last_pick():
     #             rateList.reverse()
     #             if len(rateList) > 5:
     #                 rateList.pop()
-    top5picks = rft.predictLastPick(radiant, dire, [rforest, tforest, xgbforest])
+    top5picks = rft.predictLastPick(radiant, dire, [rforest, nnmlp, xgbforest, testmo])
     heroName = []
     allRate = []
     for i in range(5):

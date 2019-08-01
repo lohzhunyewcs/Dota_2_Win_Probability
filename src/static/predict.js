@@ -20,12 +20,14 @@
               const data = JSON.parse(request.responseText);
 
               // Update the result div
-              const rforestpredictions =  `Scikit Rorest Predicted Winrate:<br/>Radiant: ${data.rforestrate.toFixed(2)}% vs Dire: ${(100 - data.rforestrate).toFixed(2)}%`
+              const rforestpredictions =  `Scikit RForest Predicted Winrate:<br/>Radiant: ${data.rforestrate.toFixed(2)}% vs Dire: ${(100 - data.rforestrate).toFixed(2)}%`
               document.querySelector('#rforestrate').innerHTML = rforestpredictions;
-              const tforestpredictions =  `Tensorflow RForest Predicted Winrate:<br/>Radiant: ${data.tforestrate.toFixed(2)}% vs Dire: ${(100 - data.tforestrate).toFixed(2)}%`
-              document.querySelector('#tforestrate').innerHTML = tforestpredictions;
+              const nnmlppredictions =  `NNMLP Predicted Winrate:<br/>Radiant: ${data.nnmlprate.toFixed(2)}% vs Dire: ${(100 - data.nnmlprate).toFixed(2)}%`
+              document.querySelector('#nnmlprate').innerHTML = nnmlppredictions;
               const xgbpredictions =  `XGBoost Predicted Winrate:<br/>Radiant: ${data.xgbrate.toFixed(2)}% vs Dire: ${(100 - data.xgbrate).toFixed(2)}%`
               document.querySelector('#xgbrate').innerHTML = xgbpredictions;
+              const testpredictions =  `Quadratic Discriminant Predicted Winrate:<br/>Radiant: ${data.testrate.toFixed(2)}% vs Dire: ${(100 - data.testrate).toFixed(2)}%`
+              document.querySelector('#testrate').innerHTML = testpredictions;
               const avgpredictions = `Average Predicted Winrate:<br/>Radiant: ${data.avgrate.toFixed(2)}% vs Dire: ${(100 - data.avgrate).toFixed(2)}%`
               document.querySelector('#avgrate').innerHTML = avgpredictions;
           }
@@ -41,3 +43,4 @@
       };
 
   });
+  
