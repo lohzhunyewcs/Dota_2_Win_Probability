@@ -28,6 +28,8 @@
               document.querySelector('#xgbrate').innerHTML = xgbpredictions;
               const testpredictions =  `Quadratic Discriminant Predicted Winrate:<br/>Radiant: ${data.testrate.toFixed(2)}% vs Dire: ${(100 - data.testrate).toFixed(2)}%`
               document.querySelector('#testrate').innerHTML = testpredictions;
+              const nn_predictions = `Deep Neural Network Predicted Winrate:<br/>Radiant: ${data.nn_rate.toFixed(2)}% vs Dire: ${(100 - data.nn_rate).toFixed(2)}%`
+              document.querySelector('#nn_rate').innerHTML = nn_predictions;
               const avgpredictions = `Average Predicted Winrate:<br/>Radiant: ${data.avgrate.toFixed(2)}% vs Dire: ${(100 - data.avgrate).toFixed(2)}%`
               document.querySelector('#avgrate').innerHTML = avgpredictions;
           }

@@ -8,8 +8,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 #from predictor import predict, createClassifier
 
+import numpy as np
+
 import allModelFile as rft
 import pickle
+import deepNN as nn
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -37,11 +40,16 @@ def generateModels():
     pickle.dump(xgbforestmodel, open(xgbfilename, 'wb'))
     pickle.dump(testmodel, open(testfilename, 'wb'))
 
-generateModels()
+# generateModels()
 rforest = pickle.load(open('scikitrforest_model.sav', 'rb'))
 nnmlp = pickle.load(open('nnmlp_model.sav', 'rb'))
 xgbforest = pickle.load(open('xgboost_model.sav', 'rb'))
 testmo = pickle.load(open('test_model.sav', 'rb'))
+try:
+    nn_model = nn.load_model()
+except Exception:
+    nn.train_model()
+    nn_model = nn.load_model()
 print('predictor complete')
 
 class Hero:
@@ -110,10 +118,22 @@ def predictor():
     nnmlprate = rft.predictResult(radiant, dire, nnmlp) * 100
     xgbrate = rft.predictResult(radiant, dire, xgbforest) * 100
     testrate = rft.predictResult(radiant, dire, testmo) * 100
+
+    uniqueColList = [24, 115, 116, 117, 118, 122, 123, 124, 125, 126, 127, 128]
+    data = np.zeros(258, dtype=int)
+    for i in radiant:
+        data[int(i)-1] = 1
+    for i in dire:
+        data[int(i) + 129 - 1] = 1
+
+    data = np.array([data]).astype(np.float32)
+
+    nn_rate = nn_model.predict(data)[0][0] * 100
+    print(f'nn_rate: {nn_rate}')
     avgrate = ((rforestrate + xgbrate) / 2)
     print('prediction done')
     # TODO: Change rate to actual predictor
-    return jsonify({'rforestrate': rforestrate, 'nnmlprate': nnmlprate, 'xgbrate': xgbrate, 'testrate': testrate, 'avgrate': avgrate})
+    return jsonify({'rforestrate': rforestrate, 'nnmlprate': nnmlprate, 'xgbrate': xgbrate, 'testrate': testrate, 'nn_rate': nn_rate, 'avgrate': avgrate})
 
 
 @app.route("/<string:team>/last_pick")
